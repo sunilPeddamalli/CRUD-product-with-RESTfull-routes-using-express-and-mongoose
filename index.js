@@ -3,7 +3,7 @@ const app = express();
 const path = require('path');
 const mongoose = require('mongoose');
 const Product = require('./models/product');
-var methodOverride = require('method-override');
+const methodOverride = require('method-override');
 
 mongoose.connect('mongodb://localhost/firstDB', { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
@@ -52,9 +52,15 @@ app.get('/products/:id/edit', async (req, res) => {
 
 app.put('/products/:id', async (req, res) => {
     const { id } = req.params;
-    const product = await Product.findByIdAndUpdate(id, req.body, { runValidators: true, new: true });
+    const product = await Product.findByIdAndUpdate(id, req.body, { runValidators: true, new: true, useFindAndModify: false });
     res.redirect(`/products/${product._id}`);
 });
+
+app.delete('/products/:id', async (req, res) => {
+    const { id } = req.params;
+    const productDeleted = await Product.findByIdAndDelete(id);
+    res.redirect('/products');
+})
 
 app.listen(3000, () => {
     console.log('Listening to Port 3000');
